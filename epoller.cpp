@@ -23,7 +23,7 @@ epoller::~epoller()
 bool epoller::__eventctl(int type, int sock, int events, void *ptr)
 {
 	struct epoll_event event = {0};
-	event.events = events | EPOLLET;
+	//event.events = events | EPOLLET;
 
 	if (ptr == NULL) event.data.fd = sock;
 	else event.data.ptr = ptr;
