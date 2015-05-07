@@ -20,22 +20,22 @@ epoller::~epoller()
 	close(_efd);
 }
 
-bool epoller::__eventctl(int type, int sock, int events, void *ptr)
+bool epoller::__eventctl(int type, int fd, int events, void *ptr)
 {
 	struct epoll_event event = {0};
-	//event.events = events | EPOLLET;
+	event.events = events | EPOLLET;
 
-	if (ptr == NULL) event.data.fd = sock;
+	if (ptr == NULL) event.data.fd = fd;
 	else event.data.ptr = ptr;
 
-	return __ctl(type, sock, &event);
+	return __ctl(type, fd, &event);
 }
 
-bool epoller::__ctl(int type, int sock, void *event)
+bool epoller::__ctl(int type, int fd, void *event)
 {
-	if (epoll_ctl(_efd, type, sock, (struct epoll_event *)event) == -1)
+	if (epoll_ctl(_efd, type, fd, (struct epoll_event *)event) == -1)
 	{
-		cerr << "epoll_ctl error." << "erron: " << errno << endl;
+		cerr << "epoll_ctl error." << endl;
 		return false;
 	}
 

@@ -7,70 +7,77 @@
 
 #include "timer.h"
 
-void print(void)
+timer::timer(const timercallback &tcb)
+	: _callback(tcb)
 {
-	cout << "hello world" << endl;
-}
-
-timer::timer()
-{
-	//add_timer(print, 10, 0);
 	// 启动定时器线程
-	//_thread = thread(&timer::__start, this);
+	_thread = thread(&timer::__start, this);
 }
 
 timer::~timer()
 {
 	// 等待线程结束
-	//_thread.join();
+	_thread.join();
 
-	// 清空定时器列表
-	//_timers.clear();
+	// 关闭定时器
+	for (auto s : _timers)
+		close(s.first);
+
+	_timers.clear();
 }
 
 void timer::__start(void)
 {
-	uint64_t timeouts;
-	struct epoll_event events[NR_TIMER] = {0};
+	/*
+	 * 使用阻塞描述符
+	 * 使用边缘触发方式
+	 */
+
+	uint64_t timeouts = 0;
+	struct epoll_event events[NR_EVENT] = {0};
 
 	while (true) {
-		cout << "here is calla" << endl;
-		//int n = epoll_wait(_epoller.fd(), events, NR_TIMER, 5000);
-		recv(4, &timeouts, sizeof(uint64_t), 0);
-		cout << "wo cao: " <<  timeouts << endl;
-		//if (n == -1 && errno == EINTR) break;
-		//cout << "here is callb - n: " << n << endl;
+		int n = epoll_wait(_epoller.fd(), events, NR_EVENT, -1);
+		if (n == -1 && errno == EINTR) break;
 
-//		for (int i = 0; i < n; i++) {
-//			recv(events[i].data.fd, &timeouts, sizeof(uint64_t), 0);
-//			unique_lock<mutex> ulock(_mtx);
-//			_timers[events[i].data.fd];
-//		}
+		for (int i = 0; i < n; i++) {
+			int timer = events[i].data.fd;
+			read(timer, &timeouts, sizeof(uint64_t));
+			__get_timer(timer)(timer);
+		}
 	}
 }
 
-bool timer::add_timer(const timercallback &tcb, time_t timeout, time_t interval)
+timercallback &timer::__get_timer(int timer)
+{
+	// 查找并返回（加锁）
+	unique_lock<mutex> ulock(_mutex);
+	map<int, timercallback>::iterator itr = _timers.find(timer);
+	if (itr != _timers.end()) return itr->second;
+	return _callback;
+}
+
+int timer::__add_timer(const timercallback &tcb, time_t timeout, time_t interval)
 {
 	int timer;
 	struct timespec now;
-	struct itimerspec value;
-	if (clock_gettime(CLOCK_MONOTONIC, &now) == -1) {
-		cerr << "clock_gettime error." << endl;
-		return false;
-	}
-
-	if ((timer = timerfd_create(CLOCK_MONOTONIC, 0)) == -1) {
+	struct itimerspec value = {0};
+	if ((timer = timerfd_create(CLOCK_REALTIME, 0)) == -1) {
 		cerr << "timerfd_create error." << endl;
 		return false;
 	}
 
-	cout << timer << endl;
+	// 增加监控
+	_epoller.add(timer, EPOLLIN);
 
-
+	if (clock_gettime(CLOCK_REALTIME, &now) == -1) {
+		cerr << "clock_gettime error." << endl;
+		return false;
+	}
 
 	// 超时时间
-	value.it_value.tv_sec = timeout;
-	value.it_value.tv_nsec = 0;
+	value.it_value.tv_sec = now.tv_sec + timeout;
+	value.it_value.tv_nsec = now.tv_nsec;
 
 	// 时间间隔
 	if (interval) {
@@ -78,38 +85,43 @@ bool timer::add_timer(const timercallback &tcb, time_t timeout, time_t interval)
 		value.it_interval.tv_nsec = 0;
 	}
 
-	now.tv_sec += timeout;
-
-	if (timerfd_settime(timer, 0, &value, NULL) == -1) {
+	if (timerfd_settime(timer, TFD_TIMER_ABSTIME, &value, NULL) == -1) {
 		cerr << "timerfd_settime error." << endl;
 		return false;
 	}
 
 	// 更新MAP（加锁）
-	unique_lock<mutex> ulock(_mtx);
+	unique_lock<mutex> ulock(_mutex);
 	_timers.insert(make_pair(timer, tcb));
-	// 增加监控
-	_epoller.add(timer, EPOLLIN);
 
-	return true;
+	return timer;
 }
 
-bool timer::del_timer(int timer)
+int timer::run_at(const timercallback &tcb, time_t thetime)
 {
-	if (timerfd_settime(timer, TFD_TIMER_ABSTIME, NULL, NULL) == -1) {
-		cerr << "timerfd_settime error." << endl;
-		return false;
-	}
+	time_t timeout = thetime - time(NULL);
+	return __add_timer(tcb, timeout, 0);
+}
 
+int timer::run_after(const timercallback &tcb, time_t timeout)
+{
+	return __add_timer(tcb, timeout, 0);
+}
+
+int timer::run_every(const timercallback &tcb, time_t interval)
+{
+	return __add_timer(tcb, interval, interval);
+}
+
+void timer::del_timer(int timer)
+{
 	// 移除监控并关闭
 	_epoller.del(timer);
 	close(timer);
 
 	// 查找并移除（加锁）
-	unique_lock<mutex> ulock(_mtx);
+	unique_lock<mutex> ulock(_mutex);
 	map<int, timercallback>::iterator itr = _timers.find(timer);
 	if (itr != _timers.end()) _timers.erase(itr);
-
-	return true;
 }
 

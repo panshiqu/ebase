@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NR_BUFFER	1024
+#include "ebase.h"
 
 class buffer {
 public:

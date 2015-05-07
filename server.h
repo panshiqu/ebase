@@ -25,21 +25,13 @@
 using namespace std;
 
 #include "epoller.h"
-
-#define NR_THREAD		4
-#define NR_EVENTS		10
-#define NR_TIMEOUT	1000
+#include "ebase.h"
 
 class client;
 class server {
 public:
 	server();
 	virtual ~server();
-
-	/*
-	 * receive thread callback
-	 */
-	void rcb(void);
 
 	/*
 	 * init listen socket
@@ -59,6 +51,11 @@ public:
 	void writable(int sock);
 
 private:
+	/*
+	 * receive send thread callback
+	 */
+	void __rscb(void);
+
 	/*
 	 * set nonblock option
 	 */

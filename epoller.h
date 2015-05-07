@@ -19,21 +19,21 @@ public:
 	epoller();
 	virtual ~epoller();
 
-	bool add(int sock, int events, void *ptr = NULL)
-	{ return __eventctl(EPOLL_CTL_ADD, sock, events, ptr); }
+	bool add(int fd, int events, void *ptr = NULL)
+	{ return __eventctl(EPOLL_CTL_ADD, fd, events, ptr); }
 
-	bool mod(int sock, int events, void *ptr = NULL)
-	{ return __eventctl(EPOLL_CTL_MOD, sock, events, ptr); }
+	bool mod(int fd, int events, void *ptr = NULL)
+	{ return __eventctl(EPOLL_CTL_MOD, fd, events, ptr); }
 
-	bool del(int sock)
-	{ return __ctl(EPOLL_CTL_DEL, sock, NULL); }
+	bool del(int fd)
+	{ return __ctl(EPOLL_CTL_DEL, fd, NULL); }
 
 	int fd(void)
 	{ return _efd; }
 
 private:
-	bool __eventctl(int type, int sock, int events, void *ptr = NULL);
-	bool __ctl(int type, int sock, void *event);
+	bool __eventctl(int type, int fd, int events, void *ptr = NULL);
+	bool __ctl(int type, int fd, void *event);
 
 private:
 	int _efd;

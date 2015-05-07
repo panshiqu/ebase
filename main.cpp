@@ -14,8 +14,17 @@ void signal_callback(int signo)
 	cout << "signal callback." << endl;
 }
 
-void print_timer()
+void error_timer(int timer)
 {
+	cout << "catch error on " << timer << endl;
+}
+
+timer t(error_timer);
+
+void print_timer(int timer)
+{
+	// please see "man timer_create"
+
     static struct timespec start;
     struct timespec curr;
     static int first_call = 1;
@@ -34,7 +43,25 @@ void print_timer()
         secs--;
         nsecs += 1000000000;
     }
-    printf("%d.%03d: ", secs, (nsecs + 500000) / 1000000);
+   // printf("%d.%03d: \n", secs, (nsecs + 500000) / 1000000);
+    printf("%d.%09d: \n", secs, nsecs);
+
+//    if (secs > 2) return t.del_timer(timer);
+}
+
+void time1(int timer)
+{
+	cout << "time1" << endl;
+}
+
+void time2(int timer)
+{
+	cout << "time2" << endl;
+}
+
+void time3(int timer)
+{
+	cout << "time3" << endl;
 }
 
 int main(int argc, char *argv[])
@@ -45,9 +72,10 @@ int main(int argc, char *argv[])
 //	srv.init("127.0.0.1", 1234);
 //	srv.loop();
 
-	timer t;
-	cout << "it is main" << endl;
-	t.add_timer(print_timer, 5, 1);
+	time_t now = time(NULL);
+	t.run_at(time1, now+5);
+	t.run_after(time2, 10);
+	t.run_every(time3, 1);
 	t.__start();
 }
 

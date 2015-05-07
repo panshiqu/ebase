@@ -23,26 +23,38 @@
 using namespace std;
 
 #include "epoller.h"
+#include "ebase.h"
 
-typedef function<void ()> timercallback;
-
-#define NR_TIMER 10
+typedef function<void (int)> timercallback;
 
 class timer {
 public:
-	timer();
+	timer(const timercallback &tcb);
 	virtual ~timer();
 
-	void __start(void);
+public:
+	// run at assign time
+	int run_at(const timercallback &tcb, time_t thetime);
 
+	// run after a period of time
+	int run_after(const timercallback &tcb, time_t timeout);
 
-	bool add_timer(const timercallback &tcb, time_t timeout, time_t interval);
-	bool del_timer(int timer);
+	// run every period of time
+	int run_every(const timercallback &tcb, time_t interval);
+
+	// delete timer
+	void del_timer(int timer);
 
 private:
-	mutex _mtx;
+	void __start(void);
+	timercallback &__get_timer(int timer);
+	int __add_timer(const timercallback &tcb, time_t timeout, time_t interval);
+
+private:
+	mutex _mutex;
 	thread _thread;
 	epoller _epoller;
+	timercallback _callback;
 	map<int, timercallback> _timers;
 };
 

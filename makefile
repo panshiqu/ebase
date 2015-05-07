@@ -1,6 +1,6 @@
 CC = gcc
 XX = g++
-CFLAGS = -g -std=c++0x -lpthread -lrt
+CFLAGS = -g -std=c++0x -lpthread
 
 TARGET = ebase
 SOURCES += $(wildcard *.c *.cc *.cpp *.cxx)

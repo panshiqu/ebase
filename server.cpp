@@ -27,6 +27,24 @@ server::~server()
 	close(_listener);
 }
 
+void server::__rscb(void)
+{
+	struct epoll_event events[NR_EVENT] = {0};
+
+	while (_running)
+	{
+		// 不得已增加超时间隔用于通知工作线程退出（你有更好方法）
+		int n = epoll_wait(_receiver.fd(), events, NR_EVENT, NR_TIMEOUT);
+
+		for (int i = 0; i < n; i++)
+		{
+			client *pclient = (client *)events[i].data.ptr;
+			if (__recv_send(pclient, events[i].events)) __proc_mod(pclient);
+			else __proc_err(pclient->fd());
+		}
+	}
+}
+
 bool server::__nonblock(int sock)
 {
 	// 获取描述符属性
@@ -116,24 +134,6 @@ bool server::__del_client(int sock)
 	return true;
 }
 
-void server::rcb(void)
-{
-	struct epoll_event events[NR_EVENTS] = {0};
-
-	while (_running)
-	{
-		// 不得已增加超时间隔用于通知工作线程退出（你有更好方法）
-		int n = epoll_wait(_receiver.fd(), events, NR_EVENTS, NR_TIMEOUT);
-
-		for (int i = 0; i < n; i++)
-		{
-			client *pclient = (client *)events[i].data.ptr;
-			if (__recv_send(pclient, events[i].events)) __proc_mod(pclient);
-			else __proc_err(pclient->fd());
-		}
-	}
-}
-
 bool server::init(const char *address, const int port)
 {
 	// 创建监听套接字
@@ -182,7 +182,7 @@ bool server::init(const char *address, const int port)
 
 	// 启动线程
 	for (int i = 0; i < NR_THREAD; i++)
-		_threads[i] = thread(&server::rcb, this);
+		_threads[i] = thread(&server::__rscb, this);
 
 	return true;
 }
