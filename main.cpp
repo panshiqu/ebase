@@ -8,6 +8,7 @@
 #include <signal.h>
 #include "server.h"
 #include "timer.h"
+#include "logger.h"
 
 void signal_callback(int signo)
 {
@@ -66,16 +67,22 @@ void time3(int timer)
 
 int main(int argc, char *argv[])
 {
-	signal(SIGINT, signal_callback);
+//	signal(SIGINT, signal_callback);
 
 //	server srv;
 //	srv.init("127.0.0.1", 1234);
 //	srv.loop();
 
-	time_t now = time(NULL);
-	t.run_at(time1, now+5);
-	t.run_after(time2, 10);
-	t.run_every(time3, 1);
-	t.__start();
+//	time_t now = time(NULL);
+//	t.run_at(time1, now+5);
+//	t.run_after(time2, 10);
+//	t.run_every(time3, 1);
+//	t.__start();
+
+//	logger::ins().set_level(logger::LOG_LEVEL::TRACE);
+//	LOG_TRACE << "hello";
+//	LOG_ERROR << "hello";
+//
+//	logger::ins().print();
 }
 
