@@ -6,15 +6,22 @@
  */
 
 #include "logger.h"
+#include "logmgr.h"
 
-logger::logger(const char *file, int line)
+logger::logger(const char *file, const int line)
+	: _line(line)
+	, _file(format_file(file))
 {
-	cout << "hello" << endl;
+
 }
 
 logger::~logger()
 {
-	cout << "~hello" << endl;
+	// 格式化日志
+	ostringstream oss;
+	oss << format_time() << " " << this_thread::get_id()
+	<< " " << _stream.str() << " " << _file << ":" << _line;
+	logmgr::ins().print(oss.str());
 }
 
 string logger::format_time(void)
@@ -42,22 +49,5 @@ string logger::format_file(const char *file)
 		str[i] = toupper(str[i]);
 
 	return str;
-}
-
-//ostringstream &logger::get_stream(void)
-//{
-//	// 创建格式化输出流
-//	ostringstream *ostr = new ostringstream();
-//
-//	// 更新LIST（加锁）
-//	unique_lock<mutex> ulock(_mutex);
-//	_streams.push_back(ostr);
-//	return *ostr;
-//}
-
-void logger::print(void)
-{
-//	for (auto s : _streams)
-//		cout << s->str() << endl;
 }
 

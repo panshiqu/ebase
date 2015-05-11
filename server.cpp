@@ -99,7 +99,7 @@ bool server::__recv_send(client *pclient, int events)
 client *server::__get_client(int sock)
 {
 	// 查找实例（加锁）
-	unique_lock<mutex> ulock(_mtx);
+	unique_lock<mutex> ulock(_mutex);
 	map<int, client *>::iterator itr = _clients.find(sock);
 	if (itr == _clients.end()) return NULL;
 	return itr->second;
@@ -116,7 +116,7 @@ client *server::__add_client(int sock)
 	}
 
 	// 更新MAP（加锁）
-	unique_lock<mutex> ulock(_mtx);
+	unique_lock<mutex> ulock(_mutex);
 	_clients.insert(make_pair(sock, pclient));
 	return pclient;
 }
@@ -124,7 +124,7 @@ client *server::__add_client(int sock)
 bool server::__del_client(int sock)
 {
 	// 查找实例（加锁）
-	unique_lock<mutex> ulock(_mtx);
+	unique_lock<mutex> ulock(_mutex);
 	map<int, client *>::iterator itr = _clients.find(sock);
 	if (itr == _clients.end()) return false;
 

@@ -9,6 +9,7 @@
 #include "server.h"
 #include "timer.h"
 #include "logger.h"
+#include "logmgr.h"
 
 void signal_callback(int signo)
 {
@@ -20,7 +21,7 @@ void error_timer(int timer)
 	cout << "catch error on " << timer << endl;
 }
 
-timer t(error_timer);
+//timer t(error_timer);
 
 void print_timer(int timer)
 {
@@ -79,10 +80,10 @@ int main(int argc, char *argv[])
 //	t.run_every(time3, 1);
 //	t.__start();
 
-//	logger::ins().set_level(logger::LOG_LEVEL::TRACE);
-//	LOG_TRACE << "hello";
-//	LOG_ERROR << "hello";
-//
-//	logger::ins().print();
+	logmgr::ins().init("/root/log");
+	logmgr::ins().set_type(LOG_CONSOLE | LOG_FILE);
+	logmgr::ins().set_level(logmgr::LOG_LEVEL::TRACE);
+	LOG_TRACE << "hello";
+	LOG_TRACE << "world";
 }
 

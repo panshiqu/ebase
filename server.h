@@ -84,7 +84,7 @@ private:
 	bool __del_client(int sock);
 
 private:
-	mutex _mtx;			// 互斥量
+	mutex _mutex;		// 互斥量
 	int _listener;		// 监听套接字
 	bool _running;		// 工作线程状态
 	epoller _accepter;	// 仅处理连接
