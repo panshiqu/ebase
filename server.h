@@ -25,6 +25,7 @@
 using namespace std;
 
 #include "epoller.h"
+#include "logger.h"
 #include "ebase.h"
 
 class client;
@@ -89,8 +90,8 @@ private:
 	bool _running;		// 工作线程状态
 	epoller _accepter;	// 仅处理连接
 	epoller _receiver;	// 仅处理收发
-	thread _threads[NR_THREAD];
-	map<int, client *> _clients;
+	thread _threads[NR_THREAD];	// 工作线程
+	map<int, client *> _clients;	// 客户端实例
 };
 
 #endif /* SERVER_H_ */

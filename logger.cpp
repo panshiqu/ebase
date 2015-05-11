@@ -6,7 +6,6 @@
  */
 
 #include "logger.h"
-#include "logmgr.h"
 
 logger::logger(const char *file, const int line)
 	: _line(line)

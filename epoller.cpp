@@ -33,9 +33,8 @@ bool epoller::__eventctl(int type, int fd, int events, void *ptr)
 
 bool epoller::__ctl(int type, int fd, void *event)
 {
-	if (epoll_ctl(_efd, type, fd, (struct epoll_event *)event) == -1)
-	{
-		cerr << "epoll_ctl error." << endl;
+	if (epoll_ctl(_efd, type, fd, (struct epoll_event *)event) == -1) {
+		LOG_ERROR << "epoll_ctl error.";
 		return false;
 	}
 

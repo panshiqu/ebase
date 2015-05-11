@@ -39,8 +39,7 @@ void buffer::refresh_recv(int len)
 	_valid_offset += len;
 
 	// 用尽缓冲区进行扩展
-	if (_valid_offset == _total_length)
-	{
+	if (_valid_offset == _total_length) {
 		_total_length += NR_BUFFER;
 		_buffer = (char *)realloc(_buffer, _total_length);
 	}
@@ -49,8 +48,7 @@ void buffer::refresh_recv(int len)
 void buffer::summarize_send(void)
 {
 	// 数据未发送完数据前移
-	if (_start_offset != _valid_offset)
-	{
+	if (_start_offset != _valid_offset) {
 		_valid_offset = get_send_length();
 		memcpy(_buffer, &_buffer[_start_offset], _valid_offset);
 	}

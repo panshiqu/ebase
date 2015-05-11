@@ -18,6 +18,8 @@
 #include <iostream>
 using namespace std;
 
+#include "logmgr.h"
+
 class logger {
 public:
 	logger(const char *file, const int line);

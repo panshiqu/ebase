@@ -21,6 +21,7 @@ public:
 	virtual ~logmgr();
 	SINGLETON(logmgr)
 
+	// 日志级别
 	enum LOG_LEVEL {
 		TRACE,
 		DEBUG,
@@ -43,8 +44,8 @@ public:
 private:
 	int _type;		// 日志类型
 	int _level;		// 日志级别
-	mutex _mutex;
-	ofstream _file;
+	mutex _mutex;	// 输出加锁
+	ofstream _file;// 日志文件
 };
 
 #endif /* LOGMGR_H_ */

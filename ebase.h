@@ -13,8 +13,7 @@
 #define NR_TIMEOUT	1000
 #define NR_BUFFER		1024
 
-enum LOG_TYPE
-{
+enum LOG_TYPE {
 	LOG_CONSOLE			= 1,	// 控制台日志
 	LOG_FILE				= 2,	// 文件日志
 	LOG_NET				= 4,	// 网络日志

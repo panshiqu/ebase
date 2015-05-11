@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 
 #include "buffer.h"
+#include "logger.h"
 
 class server;
 class client {
@@ -26,8 +27,8 @@ public:
 	int fd(void)	{ return _sfd; }
 
 private:
-	int _sfd;
-	server *_srv;
+	int _sfd;		// 套接字
+	server *_srv;	// 服务器对象
 	buffer _recv;	// 接收缓冲区
 	buffer _send;	// 发送缓冲区
 };

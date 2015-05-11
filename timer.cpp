@@ -7,8 +7,7 @@
 
 #include "timer.h"
 
-timer::timer(const timercallback &tcb)
-	: _callback(tcb)
+timer::timer()
 {
 	// 启动定时器线程
 	_thread = thread(&timer::__start, this);
@@ -63,7 +62,7 @@ int timer::__add_timer(const timercallback &tcb, time_t timeout, time_t interval
 	struct timespec now;
 	struct itimerspec value = {0};
 	if ((timer = timerfd_create(CLOCK_REALTIME, 0)) == -1) {
-		cerr << "timerfd_create error." << endl;
+		LOG_ERROR << "timerfd_create error.";
 		return false;
 	}
 
@@ -71,7 +70,7 @@ int timer::__add_timer(const timercallback &tcb, time_t timeout, time_t interval
 	_epoller.add(timer, EPOLLIN);
 
 	if (clock_gettime(CLOCK_REALTIME, &now) == -1) {
-		cerr << "clock_gettime error." << endl;
+		LOG_ERROR << "clock_gettime error.";
 		return false;
 	}
 
@@ -86,7 +85,7 @@ int timer::__add_timer(const timercallback &tcb, time_t timeout, time_t interval
 	}
 
 	if (timerfd_settime(timer, TFD_TIMER_ABSTIME, &value, NULL) == -1) {
-		cerr << "timerfd_settime error." << endl;
+		LOG_ERROR << "timerfd_settime error.";
 		return false;
 	}
 

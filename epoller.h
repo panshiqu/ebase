@@ -14,6 +14,8 @@
 #include <iostream>
 using namespace std;
 
+#include "logger.h"
+
 class epoller {
 public:
 	epoller();
@@ -36,7 +38,7 @@ private:
 	bool __ctl(int type, int fd, void *event);
 
 private:
-	int _efd;
+	int _efd;	// 描述符
 };
 
 #endif /* EPOLLER_H_ */

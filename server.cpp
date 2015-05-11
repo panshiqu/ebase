@@ -31,13 +31,11 @@ void server::__rscb(void)
 {
 	struct epoll_event events[NR_EVENT] = {0};
 
-	while (_running)
-	{
+	while (_running) {
 		// 不得已增加超时间隔用于通知工作线程退出（你有更好方法）
 		int n = epoll_wait(_receiver.fd(), events, NR_EVENT, NR_TIMEOUT);
 
-		for (int i = 0; i < n; i++)
-		{
+		for (int i = 0; i < n; i++) {
 			client *pclient = (client *)events[i].data.ptr;
 			if (__recv_send(pclient, events[i].events)) __proc_mod(pclient);
 			else __proc_err(pclient->fd());
@@ -109,9 +107,8 @@ client *server::__add_client(int sock)
 {
 	// 创建实例指针
 	client *pclient = new client(sock, this);
-	if (pclient == NULL)
-	{
-		cerr << "new error." << endl;
+	if (pclient == NULL) {
+		LOG_ERROR << "new error.";
 		return NULL;
 	}
 
@@ -137,24 +134,21 @@ bool server::__del_client(int sock)
 bool server::init(const char *address, const int port)
 {
 	// 创建监听套接字
-	if ((_listener = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-	{
-		cerr << "socket error." << endl;
+	if ((_listener = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+		LOG_ERROR << "socket error.";
 		return false;
 	}
 
 	// 设置可重用属性
 	int reuseaddr = 1;
-	if (setsockopt(_listener, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)) == -1)
-	{
-		cerr << "reuseaddr error." << endl;
+	if (setsockopt(_listener, SOL_SOCKET, SO_REUSEADDR, &reuseaddr, sizeof(reuseaddr)) == -1) {
+		LOG_ERROR << "reuseaddr error.";
 		return false;
 	}
 
 	// 设置非阻塞属性
-	if (!__nonblock(_listener))
-	{
-		cerr << "nonblock error." << endl;
+	if (!__nonblock(_listener)) {
+		LOG_ERROR << "nonblock error.";
 		return false;
 	}
 
@@ -164,16 +158,14 @@ bool server::init(const char *address, const int port)
 	inet_pton(AF_INET, address, &(addr.sin_addr));
 
 	// 绑定套接字
-	if (bind(_listener, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-	{
-		cerr << "bind error." << endl;
+	if (bind(_listener, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
+		LOG_ERROR << "bind error.";
 		return false;
 	}
 
 	// 监听套接字
-	if (listen(_listener, 10) == -1)
-	{
-		cerr << "listen error." << endl;
+	if (listen(_listener, 10) == -1) {
+		LOG_ERROR << "listen error.";
 		return false;
 	}
 
@@ -191,31 +183,27 @@ void server::loop(void)
 {
 	struct epoll_event event = {0};
 
-	while (true)
-	{
+	while (true) {
 		// 仅关注监听套接字（一个就够）
 		int n = epoll_wait(_accepter.fd(), &event, 1, -1);
 		if (n == -1 && errno == EINTR) {_running = false;break;}
 		assert(_listener == event.data.fd);
 
-		while (true)
-		{
+		while (true) {
 			int sock;
 			struct sockaddr_in addr;
 			socklen_t length = sizeof(struct sockaddr_in);
-			if ((sock = accept(_listener, (struct sockaddr *)&addr, &length)) == -1)
-			{
+			if ((sock = accept(_listener, (struct sockaddr *)&addr, &length)) == -1) {
 				// 处理完所有连接请求 errno = EAGAIN
 				if (errno != EAGAIN || errno != EWOULDBLOCK)
-					cerr << "accept error." << endl;
+					LOG_ERROR << "accept error.";
 
 				break;
 			}
 
 			// 设置非阻塞属性
-			if (!__nonblock(sock))
-			{
-				cerr << "nonblock error." << endl;
+			if (!__nonblock(sock)) {
+				LOG_ERROR << "nonblock error.";
 				break;
 			}
 

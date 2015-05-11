@@ -22,16 +22,13 @@ client::~client()
 
 bool client::run_recv(void)
 {
-	while (true)
-	{
+	while (true) {
 		int len;
 
-		if ((len = recv(_sfd, _recv.get_valid_buffer(), _recv.get_idle_length(), 0)) == -1)
-		{
+		if ((len = recv(_sfd, _recv.get_valid_buffer(), _recv.get_idle_length(), 0)) == -1) {
 			// 接收完所有数据 errno = EAGAIN
-			if (errno != EAGAIN || errno != EWOULDBLOCK)
-			{
-				cerr << "recv error." << endl;
+			if (errno != EAGAIN || errno != EWOULDBLOCK) {
+				LOG_ERROR << "recv error.";
 				return false;
 			}
 
@@ -54,16 +51,13 @@ bool client::run_recv(void)
 
 bool client::run_send(void)
 {
-	while (_send.get_send_length() > 0)
-	{
+	while (_send.get_send_length() > 0) {
 		int len;
 
-		if ((len = send(_sfd, _send.get_start_buffer(), _send.get_send_length(), 0)) == -1)
-		{
+		if ((len = send(_sfd, _send.get_start_buffer(), _send.get_send_length(), 0)) == -1) {
 			// 接收完所有数据 errno = EAGAIN
-			if (errno != EAGAIN || errno != EWOULDBLOCK)
-			{
-				cerr << "send error." << endl;
+			if (errno != EAGAIN || errno != EWOULDBLOCK) {
+				LOG_ERROR << "send error.";
 				return false;
 			}
 

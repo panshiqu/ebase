@@ -35,7 +35,7 @@ private:
 	int _start_offset;	// 起始偏移
 	int _valid_offset;	// 有效偏移
 	int _total_length;	// 总长度
-	char *_buffer;
+	char *_buffer;			// 缓存
 };
 
 #endif /* BUFFER_H_ */
