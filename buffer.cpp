@@ -59,3 +59,23 @@ void buffer::summarize_send(void)
 	_start_offset = 0;
 }
 
+int buffer::read_int(void)
+{
+	int value = _buffer[_start_offset];
+	int int_offset = _start_offset + sizeof(int);
+	for (_start_offset++; _start_offset < int_offset; _start_offset++)
+	{
+		value = value << 8;
+		value ^= _buffer[_start_offset];
+	}
+
+	return value;
+}
+
+void buffer::write_int(int value)
+{
+	_valid_offset += sizeof(int);
+	for (size_t i = 0; i < sizeof(int); i++, _valid_offset--)
+		_buffer[_valid_offset-1] = ((value >> (i * 8)) & 0xFF);
+}
+

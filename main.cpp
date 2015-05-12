@@ -9,18 +9,43 @@
 
 #include "logger.h"
 #include "server.h"
+#include "client.h"
+#include "buffer.h"
 #include "timer.h"
 
-timer t;	// 全局
+//timer t;	// 全局
+
+struct tag {
+	int length;
+};
 
 void signal_callback(int signo)
 {
-	LOG_INFO << "signal callback." << endl;
+	LOG_INFO << "signal callback.";
+	exit(EXIT_SUCCESS);
 }
 
 void default_timer(int timer)
 {
-	LOG_INFO << "catch error on " << timer << endl;
+	LOG_INFO << "catch error on " << timer;
+}
+
+void default_onmessage(client *pclient)
+{
+	LOG_INFO << "default_onmessage.";
+}
+
+void default_connection(client *pclient)
+{
+	LOG_INFO << "default_connection.";
+	buffer &msg = pclient->get_recv();
+	msg.write_int(100);
+	msg.read_int();
+}
+
+void default_disconnection(client *pclient)
+{
+	LOG_INFO << "default_disconnection.";
 }
 
 void print_timer(int timer)
@@ -59,10 +84,13 @@ int main(int argc, char *argv[])
 	logmgr::ins().set_level(logmgr::LOG_LEVEL::TRACE);
 
 	// 新增定时任务
-	t.run_every(print_timer, 10);
+//	t.run_every(print_timer, 10);
 
 	// 服务器
 	server srv;
+	srv.set_onmessage(default_onmessage);
+	srv.set_connection(default_connection);
+	srv.set_disconnection(default_disconnection);
 	srv.init("127.0.0.1", 1234);
 	srv.loop();
 }

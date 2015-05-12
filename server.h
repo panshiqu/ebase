@@ -29,6 +29,10 @@ using namespace std;
 #include "ebase.h"
 
 class client;
+typedef function<void (client *)> onmessagecallback;
+typedef function<void (client *)> connectioncallback;
+typedef function<void (client *)> disconnectioncallback;
+
 class server {
 public:
 	server();
@@ -51,6 +55,14 @@ public:
 	 */
 	void writable(int sock);
 
+	/*
+	 * server callback etc
+	 */
+	void onmessage(client *pclient)	{ _onmessage(pclient); }
+	void set_onmessage(const onmessagecallback &cb)	{ _onmessage = cb; }
+	void set_connection(const connectioncallback &cb)	{ _connection = cb; }
+	void set_disconnection(const disconnectioncallback &cb)	{ _disconnection = cb; }
+
 private:
 	/*
 	 * receive send thread callback
@@ -65,7 +77,7 @@ private:
 	/*
 	 * recv and send proc err
 	 */
-	void __proc_err(int sock);
+	void __proc_err(client *pclient);
 
 	/*
 	 * ensure events for receiver
@@ -92,6 +104,9 @@ private:
 	epoller _receiver;	// 仅处理收发
 	thread _threads[NR_THREAD];	// 工作线程
 	map<int, client *> _clients;	// 客户端实例
+	onmessagecallback _onmessage;	// 接收消息回调
+	connectioncallback _connection;	// 接受连接回调
+	disconnectioncallback _disconnection;	// 断开连接回调
 };
 
 #endif /* SERVER_H_ */

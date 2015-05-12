@@ -46,6 +46,10 @@ bool client::run_recv(void)
 	char sz[10] = "welcome\n";
 	_send.append(sz, strlen(sz));
 
+	// 处理接收
+	if (_recv.get_valid_length())
+		_srv->onmessage(this);
+
 	return true;
 }
 

@@ -31,6 +31,9 @@ public:
 	int get_valid_length(void)		{ return _valid_offset; }
 	void add_start_offset(int len){ _start_offset += len; }
 
+	int read_int(void);
+	void write_int(int value);
+
 private:
 	int _start_offset;	// 起始偏移
 	int _valid_offset;	// 有效偏移

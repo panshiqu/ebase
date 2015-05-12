@@ -37,8 +37,10 @@ void server::__rscb(void)
 
 		for (int i = 0; i < n; i++) {
 			client *pclient = (client *)events[i].data.ptr;
-			if (__recv_send(pclient, events[i].events)) __proc_mod(pclient);
-			else __proc_err(pclient->fd());
+			if (__recv_send(pclient, events[i].events))
+				__proc_mod(pclient);
+			else
+				__proc_err(pclient);
 		}
 	}
 }
@@ -55,11 +57,14 @@ bool server::__nonblock(int sock)
 	return true;
 }
 
-void server::__proc_err(int sock)
+void server::__proc_err(client *pclient)
 {
+	// 通知断开连接
+	_disconnection(pclient);
+
 	// 删除及关闭
-	__del_client(sock);
-	close(sock);
+	__del_client(pclient->fd());
+	close(pclient->fd());
 
 	/*
 	 * 套接字此时已经出错
@@ -213,6 +218,9 @@ void server::loop(void)
 
 			// 增加套接字（不管成功与否）
 			_receiver.add(sock, EPOLLIN | EPOLLONESHOT, pclient);
+
+			// 通知接受连接
+			_connection(pclient);
 		}
 	}
 }
