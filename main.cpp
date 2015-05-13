@@ -39,7 +39,7 @@ void default_connection(client *pclient)
 {
 	LOG_INFO << "default_connection.";
 	buffer &msg = pclient->get_recv();
-	msg.write_int(100);
+	msg.write_int(4160486910);
 	msg.read_int();
 }
 

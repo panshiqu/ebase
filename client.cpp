@@ -43,8 +43,8 @@ bool client::run_recv(void)
 	}
 
 	// 测试回复
-	char sz[10] = "welcome\n";
-	_send.append(sz, strlen(sz));
+//	char sz[10] = "welcome\n";
+//	_send.append(sz, strlen(sz));
 
 	// 处理接收
 	if (_recv.get_valid_length())

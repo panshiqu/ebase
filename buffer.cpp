@@ -14,7 +14,7 @@ buffer::buffer()
 	, _buffer(NULL)
 {
 	// 初始化缓冲区长度
-	_buffer = (char *)malloc(NR_BUFFER);
+	_buffer = (unsigned char *)malloc(NR_BUFFER);
 	_total_length = NR_BUFFER;
 }
 
@@ -24,7 +24,7 @@ buffer::~buffer()
 	free(_buffer);
 }
 
-void buffer::append(char *buf, int len)
+void buffer::append(unsigned char *buf, int len)
 {
 	// 记录位置刷新附加
 	int pos = _valid_offset;
@@ -41,7 +41,7 @@ void buffer::refresh_recv(int len)
 	// 用尽缓冲区进行扩展
 	if (_valid_offset == _total_length) {
 		_total_length += NR_BUFFER;
-		_buffer = (char *)realloc(_buffer, _total_length);
+		_buffer = (unsigned char *)realloc(_buffer, _total_length);
 	}
 }
 
@@ -61,12 +61,11 @@ void buffer::summarize_send(void)
 
 int buffer::read_int(void)
 {
-	int value = _buffer[_start_offset];
-	int int_offset = _start_offset + sizeof(int);
-	for (_start_offset++; _start_offset < int_offset; _start_offset++)
-	{
+	// 循环以BYTE位的方式填充整形
+	int value = _buffer[_start_offset++];
+	for (size_t i = 1; i < sizeof(int); i++) {
 		value = value << 8;
-		value ^= _buffer[_start_offset];
+		value |= _buffer[_start_offset++];
 	}
 
 	return value;
@@ -74,8 +73,8 @@ int buffer::read_int(void)
 
 void buffer::write_int(int value)
 {
-	_valid_offset += sizeof(int);
-	for (size_t i = 0; i < sizeof(int); i++, _valid_offset--)
-		_buffer[_valid_offset-1] = ((value >> (i * 8)) & 0xFF);
+	// 循环以BYTE位的方式写入缓存
+	for (int i = sizeof(int)-1; i >= 0; i--)
+		_buffer[_valid_offset++] = ((value >> (i * 8)) & 0xFF);
 }
 
