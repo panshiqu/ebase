@@ -59,6 +59,11 @@ void buffer::summarize_send(void)
 	_start_offset = 0;
 }
 
+void check(void)
+{
+
+}
+
 int buffer::read_int(void)
 {
 	// 循环以BYTE位的方式填充整形
@@ -76,5 +81,35 @@ void buffer::write_int(int value)
 	// 循环以BYTE位的方式写入缓存
 	for (int i = sizeof(int)-1; i >= 0; i--)
 		_buffer[_valid_offset++] = ((value >> (i * 8)) & 0xFF);
+}
+
+short buffer::read_short(void)
+{
+	// 循环以BYTE位的方式填充短整形
+	short value = _buffer[_start_offset++];
+	for (size_t i = 1; i < sizeof(short); i++) {
+		value = value << 8;
+		value |= _buffer[_start_offset++];
+	}
+
+	return value;
+}
+
+void buffer::write_short(short value)
+{
+	// 循环以BYTE位的方式写入缓存
+	for (int i = sizeof(short)-1; i >= 0; i--)
+		_buffer[_valid_offset++] = ((value >> (i * 8)) & 0xFF);
+}
+
+void buffer::read_data(char *data, int len)
+{
+	memcpy(data, &_buffer[_start_offset], len);
+	_start_offset += len;
+}
+
+void write_data(char *data, int len)
+{
+
 }
 

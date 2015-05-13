@@ -31,8 +31,16 @@ public:
 	int get_valid_length(void)		{ return _valid_offset; }
 	void add_start_offset(int len){ _start_offset += len; }
 
+	void check(void);
+
 	int read_int(void);
 	void write_int(int value);
+
+	short read_short(void);
+	void write_short(short value);
+
+	void read_data(char *data, int len);
+	void write_data(char *data, int len);
 
 private:
 	int _start_offset;	// 起始偏移

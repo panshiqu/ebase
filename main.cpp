@@ -32,15 +32,17 @@ void default_timer(int timer)
 
 void default_onmessage(client *pclient)
 {
-	LOG_INFO << "default_onmessage.";
+	buffer &msg = pclient->get_recv();
+	int length = msg.read_int();
+	int command = msg.read_int();
+	char buf[1024] = {0};
+	msg.read_data(buf, length - 8);
+	cout << "length: " << length << "command: " << command << "message: " << buf << endl;
 }
 
 void default_connection(client *pclient)
 {
 	LOG_INFO << "default_connection.";
-	buffer &msg = pclient->get_recv();
-	msg.write_int(4160486910);
-	msg.read_int();
 }
 
 void default_disconnection(client *pclient)
