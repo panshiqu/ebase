@@ -38,16 +38,12 @@ bool client::run_recv(void)
 		// 对端关闭连接
 		if (len == 0) return false;
 
-		// 更新接收
-		_recv.refresh_recv(len);
+		// 增加有效偏移
+		_recv.incr_valid_offset(len);
 	}
 
-	// 测试回复
-//	char sz[10] = "welcome\n";
-//	_send.append(sz, strlen(sz));
-
 	// 处理接收
-	if (_recv.get_valid_length())
+	if (_recv.check())
 		_srv->onmessage(this);
 
 	return true;
@@ -55,10 +51,10 @@ bool client::run_recv(void)
 
 bool client::run_send(void)
 {
-	while (_send.get_send_length() > 0) {
+	while (_send.get_used_length() > 0) {
 		int len;
 
-		if ((len = send(_sfd, _send.get_start_buffer(), _send.get_send_length(), 0)) == -1) {
+		if ((len = send(_sfd, _send.get_start_buffer(), _send.get_used_length(), 0)) == -1) {
 			// 接收完所有数据 errno = EAGAIN
 			if (errno != EAGAIN || errno != EWOULDBLOCK) {
 				LOG_ERROR << "send error.";
@@ -72,11 +68,11 @@ bool client::run_send(void)
 		if (len == 0) return false;
 
 		// 更新缓冲区起始位置
-		_send.add_start_offset(len);
+		_send.incr_start_offset(len);
 	}
 
-	// 总结发送（存在缓冲区数据未发送完）
-	_send.summarize_send();
+	// 重置缓冲区
+	_send.reset();
 
 	return true;
 }

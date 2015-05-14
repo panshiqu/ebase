@@ -12,6 +12,9 @@
 #include <arpa/inet.h>
 #include <string.h>
 
+#include <iostream>
+using namespace std;
+
 void write_int(int value, char *_buffer)
 {
 	_buffer[3] = (value & 0xFF);
@@ -34,14 +37,25 @@ int main(int argc, char *argv[])
 	connect(sock, (struct sockaddr *)&addr, sizeof(addr));
 
 	while (true) {
-		char buf[1024];
-		write_int(13, buf);
-		write_int(2147483647, &buf[4]);
-		char hel[10] = "hello";
-		memcpy(&buf[8], hel, 5);
-		send(sock, buf, 13, 0);
+		{
+			char buf[1024];
+			write_int(13, buf);
+			write_int(2147483647, &buf[4]);
+			char hel[10] = "hello";
+			memcpy(&buf[8], hel, 5);
+			send(sock, buf, 13, 0);
+		}
+		{
+			char buf[1024];
+			write_int(13, buf);
+			write_int(2147483647, &buf[4]);
+			char hel[10] = "world";
+			memcpy(&buf[8], hel, 5);
+			send(sock, buf, 13, 0);
+		}
 		char rcv[1024];
 		recv(sock, rcv, 1024, 0);
+		cout << "Recv: " << rcv << endl;
 	}
 }
 

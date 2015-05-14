@@ -15,14 +15,10 @@
 
 //timer t;	// 全局
 
-struct tag {
-	int length;
-};
-
 void signal_callback(int signo)
 {
 	LOG_INFO << "signal callback.";
-	exit(EXIT_SUCCESS);
+	//exit(EXIT_SUCCESS);
 }
 
 void default_timer(int timer)
@@ -32,12 +28,23 @@ void default_timer(int timer)
 
 void default_onmessage(client *pclient)
 {
+	// 消息接收
 	buffer &msg = pclient->get_recv();
-	int length = msg.read_int();
-	int command = msg.read_int();
-	char buf[1024] = {0};
-	msg.read_data(buf, length - 8);
-	cout << "length: " << length << "command: " << command << "message: " << buf << endl;
+	do {
+		int length = msg.read_int();
+		int command = msg.read_int();
+
+		char rcv[1024] = {0};
+		msg.read_data(rcv, length - 8);
+		cout << "length: " << length << " command: " << command << " message: " << rcv << endl;
+	} while (msg.check());
+
+	msg.reset();
+
+	// 消息发送
+	char snd[1024] = "welcome";
+	buffer &msgsend = pclient->get_send();
+	msgsend.write_data(snd, strlen(snd));
 }
 
 void default_connection(client *pclient)
@@ -86,6 +93,7 @@ int main(int argc, char *argv[])
 	logmgr::ins().set_level(logmgr::LOG_LEVEL::TRACE);
 
 	// 新增定时任务
+//	t.set_callback(default_timer);
 //	t.run_every(print_timer, 10);
 
 	// 服务器

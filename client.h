@@ -23,7 +23,7 @@ public:
 	bool run_recv(void);
 	bool run_send(void);
 
-	bool is_need_send(void)	{ return _send.get_valid_length(); }
+	bool is_need_send(void)	{ return _send.get_valid_offset(); }
 	buffer &get_recv(void)	{ return _recv; }
 	buffer &get_send(void)	{ return _send; }
 	int fd(void)	{ return _sfd; }

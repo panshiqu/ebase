@@ -62,9 +62,8 @@ void server::__proc_err(client *pclient)
 	// 通知断开连接
 	_disconnection(pclient);
 
-	// 删除及关闭
+	// 删除客户端
 	__del_client(pclient->fd());
-	close(pclient->fd());
 
 	/*
 	 * 套接字此时已经出错

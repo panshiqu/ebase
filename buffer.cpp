@@ -24,20 +24,8 @@ buffer::~buffer()
 	free(_buffer);
 }
 
-void buffer::append(unsigned char *buf, int len)
+void buffer::extra(void)
 {
-	// 记录位置刷新附加
-	int pos = _valid_offset;
-	refresh_recv(len);
-
-	// 数据拷贝
-	memcpy(&_buffer[pos], buf, len);
-}
-
-void buffer::refresh_recv(int len)
-{
-	_valid_offset += len;
-
 	// 用尽缓冲区进行扩展
 	if (_valid_offset == _total_length) {
 		_total_length += NR_BUFFER;
@@ -45,23 +33,37 @@ void buffer::refresh_recv(int len)
 	}
 }
 
-void buffer::summarize_send(void)
+void buffer::reset(void)
 {
-	// 数据未发送完数据前移
+	// 数据未使用完数据前移
 	if (_start_offset != _valid_offset) {
-		_valid_offset = get_send_length();
+		_valid_offset = get_used_length();
 		memcpy(_buffer, &_buffer[_start_offset], _valid_offset);
 	}
-	// 数据发送完重置各偏移
+	// 数据使用完重置各偏移
 	else _valid_offset = 0;
 
 	// 无论如何
 	_start_offset = 0;
 }
 
-void check(void)
+bool buffer::check(void)
 {
+	int len = sizeof(int);
 
+	// 检测是否收全长度值
+	if (get_used_length() < len)
+		return false;
+
+	// 读取消息长度并回退偏移
+	int length = read_int();
+	decr_start_offset(len);
+
+	// 检测是否收全信息
+	if (length > get_used_length())
+		return false;
+
+	return true;
 }
 
 int buffer::read_int(void)
@@ -104,12 +106,18 @@ void buffer::write_short(short value)
 
 void buffer::read_data(char *data, int len)
 {
+	// 读取指定长度数据
 	memcpy(data, &_buffer[_start_offset], len);
 	_start_offset += len;
 }
 
-void write_data(char *data, int len)
+void buffer::write_data(char *data, int len)
 {
+	// 记录位置增加有效偏移
+	int pos = _valid_offset;
+	incr_valid_offset(len);
 
+	// 数据拷贝
+	memcpy(&_buffer[pos], data, len);
 }
 
