@@ -7,6 +7,8 @@
 
 #include "logger.h"
 
+using namespace std;
+
 logger::logger()
 	: _type(LOG_CONSOLE)
 	, _level(LOG_LEVEL::TRACE)
@@ -33,7 +35,7 @@ bool logger::init(const char *address, const int port)
 	return true;
 }
 
-void logger::print(string str)
+void logger::print(std::string str)
 {
 	// 不管输出到那里加锁先
 	unique_lock<mutex> ulock(_mutex);

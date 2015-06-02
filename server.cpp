@@ -8,6 +8,8 @@
 #include "server.h"
 #include "client.h"
 
+using namespace std;
+
 server::server()
 	: _listener(0)
 	, _running(true)

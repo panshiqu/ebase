@@ -11,9 +11,6 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 
-#include <iostream>
-using namespace std;
-
 #include "logger.h"
 
 class epoller {

@@ -7,6 +7,8 @@
 
 #include "timer.h"
 
+using namespace std;
+
 timer::timer()
 {
 	// 启动定时器线程

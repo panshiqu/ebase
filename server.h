@@ -22,16 +22,15 @@
 #include <mutex>
 #include <thread>
 #include <iostream>
-using namespace std;
 
 #include "epoller.h"
 #include "logger.h"
 #include "ebase.h"
 
 class client;
-typedef function<void (client *)> onmessagecallback;
-typedef function<void (client *)> connectioncallback;
-typedef function<void (client *)> disconnectioncallback;
+typedef std::function<void (client *)> onmessagecallback;
+typedef std::function<void (client *)> connectioncallback;
+typedef std::function<void (client *)> disconnectioncallback;
 
 class server {
 public:
@@ -97,13 +96,13 @@ private:
 	bool __del_client(int sock);
 
 private:
-	mutex _mutex;		// 互斥量
 	int _listener;		// 监听套接字
 	bool _running;		// 工作线程状态
 	epoller _accepter;	// 仅处理连接
 	epoller _receiver;	// 仅处理收发
-	thread _threads[NR_THREAD];	// 工作线程
-	map<int, client *> _clients;	// 客户端实例
+	std::mutex _mutex;		// 互斥量
+	std::thread _threads[NR_THREAD];	// 工作线程
+	std::map<int, client *> _clients;// 客户端实例
 	onmessagecallback _onmessage;	// 接收消息回调
 	connectioncallback _connection;	// 接受连接回调
 	disconnectioncallback _disconnection;	// 断开连接回调

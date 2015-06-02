@@ -19,14 +19,12 @@
 #include <mutex>
 #include <thread>
 #include <iostream>
-#include <functional>
-using namespace std;
 
 #include "epoller.h"
 #include "logger.h"
 #include "ebase.h"
 
-typedef function<void (int)> timercallback;
+typedef std::function<void (int)> timercallback;
 
 class timer {
 public:
@@ -55,11 +53,11 @@ private:
 	int __add_timer(const timercallback &tcb, time_t timeout, time_t interval);
 
 private:
-	mutex _mutex;	// 定时器列表操作加锁
-	thread _thread;	// 定时器线程
+	std::mutex _mutex;	// 定时器列表操作加锁
+	std::thread _thread;	// 定时器线程
 	epoller _epoller;		// 监控到期
 	timercallback _callback;	// 默认回调
-	map<int, timercallback> _timers;	// 定时器列表
+	std::map<int, timercallback> _timers;	// 定时器列表
 };
 
 #endif /* TIMER_H_ */

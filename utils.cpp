@@ -7,6 +7,8 @@
 
 #include "utils.h"
 
+using namespace std;
+
 utils::utils()
 {
 

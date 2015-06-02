@@ -12,7 +12,6 @@
 #include <sys/socket.h>
 
 #include "buffer.h"
-#include "logger.h"
 
 class server;
 class client {
