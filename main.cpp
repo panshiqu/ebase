@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
 	signal(SIGINT, signal_callback);
 
 	// 初始化日志模块
-	logmgr::ins().init("/root/log");
-	logmgr::ins().set_type(LOG_CONSOLE | LOG_FILE);
-	logmgr::ins().set_level(logmgr::LOG_LEVEL::TRACE);
+	logger::ins().init("/root/log");
+	logger::ins().set_type(LOG_CONSOLE | LOG_FILE);
+	logger::ins().set_level(logger::LOG_LEVEL::TRACE);
 
 	// 新增定时任务
 //	t.set_callback(default_timer);

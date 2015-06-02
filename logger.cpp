@@ -7,46 +7,47 @@
 
 #include "logger.h"
 
-logger::logger(const char *file, const int line)
-	: _line(line)
-	, _file(format_file(file))
+logger::logger()
+	: _type(LOG_CONSOLE)
+	, _level(LOG_LEVEL::TRACE)
 {
 
 }
 
 logger::~logger()
 {
-	// 格式化日志
-	ostringstream oss;
-	oss << format_time() << " " << this_thread::get_id()
-	<< " " << _stream.str() << " " << _file << ":" << _line;
-	logmgr::ins().print(oss.str());
+	// 关闭文件
+	_file.close();
 }
 
-string logger::format_time(void)
+bool logger::init(const char *file)
 {
-	// 获取时间
-	char sztime[20];
-	time_t curtime = time(NULL);
-	memset(sztime, 0, sizeof(sztime));
-	struct tm *t = localtime(&curtime);
-	strftime(sztime, sizeof(sztime), "%Y-%m-%d %H:%M:%S", t);
-
-	return sztime;
+	// 打开文件
+	_file.open(file, ios_base::app);
+	return true;
 }
 
-string logger::format_file(const char *file)
+bool logger::init(const char *address, const int port)
 {
-	string str(file);
+	// 暂未实现
+	return true;
+}
 
-	// 取文件名
-	size_t pos = str.find_last_of("/");
-	if (pos != string::npos) str = str.substr(pos+1);
+void logger::print(string str)
+{
+	// 不管输出到那里加锁先
+	unique_lock<mutex> ulock(_mutex);
 
-	// 全部转换成大写
-	for (size_t i = 0; i < str.size(); i++)
-		str[i] = toupper(str[i]);
+	// 输出至控制台
+	if (_type & LOG_CONSOLE)
+		cout << str << endl;
 
-	return str;
+	// 输出至文件
+	if (_type & LOG_FILE)
+		_file << str << endl;
+
+	// 输出至网络
+	if (_type & LOG_NET)
+		cout << "unimplemented" << endl;
 }
 
