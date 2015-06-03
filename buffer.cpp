@@ -27,7 +27,7 @@ buffer::~buffer()
 void buffer::extra(void)
 {
 	// 用尽缓冲区进行扩展
-	if (_valid_offset == _total_length) {
+	while (_valid_offset >= _total_length) {
 		_total_length += NR_BUFFER;
 		_buffer = (unsigned char *)realloc(_buffer, _total_length);
 	}
@@ -66,6 +66,15 @@ bool buffer::check(void)
 	return true;
 }
 
+void buffer::ensure(int len)
+{
+	// 确保缓冲区足够使用
+	while (get_idle_length() <= len) {
+		_total_length += NR_BUFFER;
+		_buffer = (unsigned char *)realloc(_buffer, _total_length);
+	}
+}
+
 int buffer::read_int(void)
 {
 	// 循环以BYTE位的方式填充整形
@@ -80,6 +89,8 @@ int buffer::read_int(void)
 
 void buffer::write_int(int value)
 {
+	ensure(sizeof(int));
+
 	// 循环以BYTE位的方式写入缓存
 	for (int i = sizeof(int)-1; i >= 0; i--)
 		_buffer[_valid_offset++] = ((value >> (i * 8)) & 0xFF);
@@ -99,6 +110,8 @@ short buffer::read_short(void)
 
 void buffer::write_short(short value)
 {
+	ensure(sizeof(short));
+
 	// 循环以BYTE位的方式写入缓存
 	for (int i = sizeof(short)-1; i >= 0; i--)
 		_buffer[_valid_offset++] = ((value >> (i * 8)) & 0xFF);
@@ -113,11 +126,8 @@ void buffer::read_data(char *data, int len)
 
 void buffer::write_data(char *data, int len)
 {
-	// 记录位置增加有效偏移
-	int pos = _valid_offset;
-	incr_valid_offset(len);
-
 	// 数据拷贝
-	memcpy(&_buffer[pos], data, len);
+	ensure(len);
+	memcpy(&_buffer[_valid_offset], data, len);
 }
 

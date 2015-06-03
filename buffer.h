@@ -33,6 +33,7 @@ public:
 	void extra(void);
 	void reset(void);
 	bool check(void);
+	void ensure(int len);
 
 	int read_int(void);
 	void write_int(int value);
