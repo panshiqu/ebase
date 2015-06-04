@@ -13,6 +13,9 @@
 #include "buffer.h"
 #include "timer.h"
 
+#include <iostream>
+using namespace std;
+
 //timer t;	// 全局
 
 void signal_callback(int signo)
