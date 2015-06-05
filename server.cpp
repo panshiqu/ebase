@@ -152,6 +152,13 @@ bool server::init(const char *address, const int port)
 		return false;
 	}
 
+	// 设置可重用属性
+	int reuseport = 1;
+	if (setsockopt(_listener, SOL_SOCKET, SO_REUSEPORT, &reuseport, sizeof(reuseport)) == -1) {
+		LOG_ERROR << "reuseport error.";
+		return false;
+	}
+
 	// 设置非阻塞属性
 	if (!__nonblock(_listener)) {
 		LOG_ERROR << "nonblock error.";
@@ -192,7 +199,7 @@ void server::loop(void)
 	while (true) {
 		// 仅关注监听套接字（一个就够）
 		int n = epoll_wait(_accepter.fd(), &event, 1, -1);
-		if (n == -1 && errno == EINTR) {_running = false;break;}
+		//if (n == -1 && errno == EINTR) {_running = false;break;}
 		assert(_listener == event.data.fd);
 
 		while (true) {
