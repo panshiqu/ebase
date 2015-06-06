@@ -199,7 +199,7 @@ void server::loop(void)
 	while (true) {
 		// 仅关注监听套接字（一个就够）
 		int n = epoll_wait(_accepter.fd(), &event, 1, -1);
-		//if (n == -1 && errno == EINTR) {_running = false;break;}
+		if (n == -1 && errno == EINTR) {_running = false;break;}
 		assert(_listener == event.data.fd);
 
 		while (true) {

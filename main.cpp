@@ -11,6 +11,7 @@
 #include "server.h"
 #include "client.h"
 #include "buffer.h"
+#include "config.h"
 #include "timer.h"
 
 #include <iostream>
@@ -48,16 +49,25 @@ void default_onmessage(client *pclient)
 	char snd[1024] = "welcome";
 	buffer &msgsend = pclient->get_send();
 	msgsend.write_data(snd, strlen(snd));
+	msgsend.incr_valid_offset(strlen(snd));
 }
 
 void default_connection(client *pclient)
 {
-	LOG_INFO << "default_connection.";
+	int port;
+	char address[INET_ADDRSTRLEN] = {0};
+
+	pclient->get_info(address, port);
+	LOG_INFO << "default_connection-" << address << ":" << port;
 }
 
 void default_disconnection(client *pclient)
 {
-	LOG_INFO << "default_disconnection.";
+	int port;
+	char address[INET_ADDRSTRLEN] = {0};
+
+	pclient->get_info(address, port);
+	LOG_INFO << "default_disconnection-" << address << ":" << port;
 }
 
 void print_timer(int timer)
@@ -84,6 +94,8 @@ void print_timer(int timer)
 	}
 
 	LOG_INFO << secs << "." << nsecs;
+
+	//t.del_timer(timer);
 }
 
 int main(int argc, char *argv[])
@@ -95,9 +107,13 @@ int main(int argc, char *argv[])
 	logger::ins().set_type(LOG_CONSOLE | LOG_FILE);
 	logger::ins().set_level(logger::LOG_LEVEL::TRACE);
 
+	// 解析自定义格式配置文件
+	config::ins().load("/root/桌面/ebase/example/xhome.conf");
+
 	// 新增定时任务
 //	t.set_callback(default_timer);
-//	t.run_every(print_timer, 10);
+//	t.run_every(print_timer, 1);
+//	t.__start();
 
 	// 服务器
 	server srv;
