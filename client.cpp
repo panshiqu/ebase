@@ -77,3 +77,13 @@ bool client::run_send(void)
 	return true;
 }
 
+void client::get_info(char *address, int &port)
+{
+	// 获取连接信息
+	struct sockaddr_in addr;
+	socklen_t length = sizeof(struct sockaddr_in);
+	getsockname(_sfd, (struct sockaddr *)&addr, &length);
+	inet_ntop(AF_INET, (void *)&addr.sin_addr, address, INET_ADDRSTRLEN);
+	port = addr.sin_port;
+}
+

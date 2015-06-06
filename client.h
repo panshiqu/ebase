@@ -21,6 +21,7 @@ public:
 
 	bool run_recv(void);
 	bool run_send(void);
+	void get_info(char *address, int &port);
 
 	bool is_need_send(void)	{ return _send.get_valid_offset(); }
 	buffer &get_recv(void)	{ return _recv; }
