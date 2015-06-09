@@ -22,6 +22,10 @@ public:
 	static std::string format_now_time(void);
 
 	static std::string format_upper_file(const char *file);
+
+	static time_t str2time(std::string str);
+
+	static std::string time2str(time_t tt);
 };
 
 #endif /* UTILS_H_ */

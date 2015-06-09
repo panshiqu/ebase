@@ -46,3 +46,22 @@ string utils::format_upper_file(const char *file)
 	return str;
 }
 
+time_t utils::str2time(std::string str)
+{
+	// 字符串转时间
+	struct tm t = {0};
+	strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &t);
+
+	return mktime(&t);
+}
+
+std::string utils::time2str(time_t tt)
+{
+	// 时间转字符串
+	char str[20] = {0};
+	struct tm *t = localtime(&tt);
+	strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", t);
+
+	return str;
+}
+
