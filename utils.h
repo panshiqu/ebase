@@ -12,6 +12,7 @@
 #include <ctype.h>	// for toupper
 #include <string.h>	// for memset
 
+#include <list>
 #include <iostream>
 
 class utils {
@@ -26,6 +27,10 @@ public:
 	static time_t str2time(std::string str);
 
 	static std::string time2str(time_t tt);
+
+	static void split_str(std::list<int> &splits, std::string source, std::string delimiter);
+
+	static void split_str(std::list<std::string> &splits, std::string source, std::string delimiter);
 };
 
 #endif /* UTILS_H_ */

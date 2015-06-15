@@ -65,3 +65,29 @@ std::string utils::time2str(time_t tt)
 	return str;
 }
 
+void utils::split_str(std::list<int> &splits, std::string source, std::string delimiter)
+{
+	// 切分字符串
+	size_t index;
+	while ((index = source.find(delimiter)) != string::npos) {
+		splits.push_back(atoi(source.substr(0, index).c_str()));
+		source = source.substr(index+1, -1);
+	}
+
+	if (!source.empty())
+		splits.push_back(atoi(source.c_str()));
+}
+
+void utils::split_str(std::list<std::string> &splits, std::string source, std::string delimiter)
+{
+	// 切分字符串
+	size_t index;
+	while ((index = source.find(delimiter)) != string::npos) {
+		splits.push_back(source.substr(0, index).c_str());
+		source = source.substr(index+1, -1);
+	}
+
+	if (!source.empty())
+		splits.push_back(source);
+}
+
