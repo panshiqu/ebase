@@ -63,7 +63,7 @@ public:
 	void set_disconnection(const disconnectioncallback &cb)	{ _disconnection = cb; }
 
 	// exit epoll_wait to release
-	void exit_wait(void)	{ write(fds[0], "exit", sizeof("exit")); }
+	void exit_wait(void)	{ write(_fds[0], "exit", sizeof("exit")); }
 
 private:
 	/*
@@ -99,7 +99,7 @@ private:
 	bool __del_client(int sock);
 
 private:
-	int fds[2];			// SocketPair
+	int _fds[2];		// SocketPair
 	int _listener;		// 监听套接字
 	epoller _accepter;	// 仅处理连接
 	epoller _receiver;	// 仅处理收发

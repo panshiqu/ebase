@@ -48,7 +48,7 @@ public:
 	void set_callback(const timercallback &tcb)	{ _callback = tcb; }
 
 	// exit epoll_wait to release
-	void exit_wait(void)	{ write(fds[0], "exit", sizeof("exit")); }
+	void exit_wait(void)	{ write(_fds[0], "exit", sizeof("exit")); }
 
 private:
 	void __start(void);
@@ -56,7 +56,7 @@ private:
 	int __add_timer(const timercallback &tcb, time_t timeout, time_t interval);
 
 private:
-	int fds[2];				// SocketPair
+	int _fds[2];			// SocketPair
 	std::mutex _mutex;	// 定时器列表操作加锁
 	std::thread _thread;	// 定时器线程
 	epoller _epoller;		// 监控到期

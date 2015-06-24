@@ -12,8 +12,8 @@ using namespace std;
 timer::timer()
 {
 	// 不考虑失败
-	memset(fds, 0, sizeof(fds));
-	socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
+	memset(_fds, 0, sizeof(_fds));
+	socketpair(AF_LOCAL, SOCK_STREAM, 0, _fds);
 
 	// 启动定时器线程
 	_thread = thread(&timer::__start, this);
@@ -29,6 +29,8 @@ timer::~timer()
 		close(s.first);
 
 	_timers.clear();
+	close(_fds[0]);
+	close(_fds[1]);
 }
 
 void timer::__start(void)
@@ -39,7 +41,7 @@ void timer::__start(void)
 	 */
 
 	uint64_t timeouts = 0;
-	_epoller.add(fds[1], EPOLLIN);
+	_epoller.add(_fds[1], EPOLLIN);
 	struct epoll_event events[NR_EVENT] = {0};
 
 	while (true) {
@@ -47,7 +49,7 @@ void timer::__start(void)
 
 		for (int i = 0; i < n; i++) {
 			int timer = events[i].data.fd;
-			if (timer == fds[1]) return ;	// 退出
+			if (timer == _fds[1]) return ;	// 退出
 			read(timer, &timeouts, sizeof(uint64_t));
 			__get_timer(timer)(timer);
 		}

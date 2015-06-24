@@ -14,8 +14,8 @@ server::server()
 	: _listener(0)
 {
 	// 不考虑失败
-	memset(fds, 0, sizeof(fds));
-	socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
+	memset(_fds, 0, sizeof(_fds));
+	socketpair(AF_LOCAL, SOCK_STREAM, 0, _fds);
 }
 
 server::~server()
@@ -28,6 +28,8 @@ server::~server()
 
 	_clients.clear();
 	close(_listener);
+	close(_fds[0]);
+	close(_fds[1]);
 }
 
 void server::__rscb(void)
@@ -38,7 +40,7 @@ void server::__rscb(void)
 		int n = epoll_wait(_receiver.fd(), events, NR_EVENT, -1);
 
 		for (int i = 0; i < n; i++) {
-			if (events[i].data.fd == fds[1])
+			if (events[i].data.fd == _fds[1])
 			{
 				exit_wait();
 				return ;
@@ -196,8 +198,8 @@ bool server::init(const char *address, const int port)
 		_threads[i] = thread(&server::__rscb, this);
 
 	// 增加SocketPair
-	_accepter.add(fds[1], EPOLLIN);
-	_receiver.add(fds[1], EPOLLIN);
+	_accepter.add(_fds[1], EPOLLIN);
+	_receiver.add(_fds[1], EPOLLIN);
 
 	return true;
 }
@@ -209,7 +211,7 @@ void server::loop(void)
 	while (true) {
 		// 仅关注监听套接字（一个就够）(即便现在增加了SocketPair)
 		epoll_wait(_accepter.fd(), &event, 1, -1);
-		if (event.data.fd == fds[1]) break;
+		if (event.data.fd == _fds[1]) break;
 
 		while (true) {
 			int sock;
