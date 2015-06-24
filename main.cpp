@@ -17,12 +17,14 @@
 #include <iostream>
 using namespace std;
 
-//timer t;	// 全局
+timer t;	// 全局
+server srv;	// 全局
 
 void signal_callback(int signo)
 {
 	LOG_INFO << "signal callback.";
-	//exit(EXIT_SUCCESS);
+	srv.exit_wait();
+	t.exit_wait();
 }
 
 void default_timer(int timer)
@@ -111,12 +113,10 @@ int main(int argc, char *argv[])
 	config::ins().load("/root/桌面/ebase/example/xhome.conf");
 
 	// 新增定时任务
-//	t.set_callback(default_timer);
-//	t.run_every(print_timer, 1);
-//	t.__start();
+	t.set_callback(default_timer);
+	t.run_every(print_timer, 1);
 
 	// 服务器
-	server srv;
 	srv.set_onmessage(default_onmessage);
 	srv.set_connection(default_connection);
 	srv.set_disconnection(default_disconnection);

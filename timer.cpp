@@ -11,6 +11,10 @@ using namespace std;
 
 timer::timer()
 {
+	// 不考虑失败
+	memset(fds, 0, sizeof(fds));
+	socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
+
 	// 启动定时器线程
 	_thread = thread(&timer::__start, this);
 }
@@ -35,14 +39,15 @@ void timer::__start(void)
 	 */
 
 	uint64_t timeouts = 0;
+	_epoller.add(fds[1], EPOLLIN);
 	struct epoll_event events[NR_EVENT] = {0};
 
 	while (true) {
 		int n = epoll_wait(_epoller.fd(), events, NR_EVENT, -1);
-		if (n == -1 && errno == EINTR) break;
 
 		for (int i = 0; i < n; i++) {
 			int timer = events[i].data.fd;
+			if (timer == fds[1]) return ;	// 退出
 			read(timer, &timeouts, sizeof(uint64_t));
 			__get_timer(timer)(timer);
 		}

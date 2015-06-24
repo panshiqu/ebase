@@ -12,9 +12,10 @@ using namespace std;
 
 server::server()
 	: _listener(0)
-	, _running(true)
 {
-
+	// 不考虑失败
+	memset(fds, 0, sizeof(fds));
+	socketpair(AF_LOCAL, SOCK_STREAM, 0, fds);
 }
 
 server::~server()
@@ -33,11 +34,16 @@ void server::__rscb(void)
 {
 	struct epoll_event events[NR_EVENT] = {0};
 
-	while (_running) {
-		// 不得已增加超时间隔用于通知工作线程退出（你有更好方法）
-		int n = epoll_wait(_receiver.fd(), events, NR_EVENT, NR_TIMEOUT);
+	while (true) {
+		int n = epoll_wait(_receiver.fd(), events, NR_EVENT, -1);
 
 		for (int i = 0; i < n; i++) {
+			if (events[i].data.fd == fds[1])
+			{
+				exit_wait();
+				return ;
+			}
+
 			client *pclient = (client *)events[i].data.ptr;
 			if (__recv_send(pclient, events[i].events))
 				__proc_mod(pclient);
@@ -189,6 +195,10 @@ bool server::init(const char *address, const int port)
 	for (int i = 0; i < NR_THREAD; i++)
 		_threads[i] = thread(&server::__rscb, this);
 
+	// 增加SocketPair
+	_accepter.add(fds[1], EPOLLIN);
+	_receiver.add(fds[1], EPOLLIN);
+
 	return true;
 }
 
@@ -197,10 +207,9 @@ void server::loop(void)
 	struct epoll_event event = {0};
 
 	while (true) {
-		// 仅关注监听套接字（一个就够）
-		int n = epoll_wait(_accepter.fd(), &event, 1, -1);
-		if (n == -1 && errno == EINTR) {_running = false;break;}
-		assert(_listener == event.data.fd);
+		// 仅关注监听套接字（一个就够）(即便现在增加了SocketPair)
+		epoll_wait(_accepter.fd(), &event, 1, -1);
+		if (event.data.fd == fds[1]) break;
 
 		while (true) {
 			int sock;
