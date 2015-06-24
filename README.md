@@ -48,5 +48,6 @@ June 6, 2015
 
 June 24, 2015
 采纳网友好建议，使用SocketPair解决通知线程退出问题，这里问题解决将不再有上面测试定时器的麻烦步骤，详细请直接参看源码。
+新增使用PowerDesigner16.5绘制的UML Class Diagram，同步提供PDF文件方便阅读。
 
 
