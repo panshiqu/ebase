@@ -25,9 +25,7 @@ void config::trim(char *str)
 	char *post = (char *)str;
 
 	while (*post) {
-		if (*post == ' ' || *post == ',' ||
-			*post == '"' || *post == '\n' ||
-			*post == '\t') {
+		if (is_trim(*post)) {
 			post++;
 			continue;
 		}
@@ -39,6 +37,14 @@ void config::trim(char *str)
 	}
 
 	*pre = '\0';
+}
+
+bool config::is_trim(const char ch)
+{
+	if (ch == ' ' || ch == ',' || ch == '"' || ch == '\n' || ch == '\t')
+		return true;
+
+	return false;
 }
 
 bool config::load(const char *file)

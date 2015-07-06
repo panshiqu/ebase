@@ -91,3 +91,23 @@ void utils::split_str(std::list<std::string> &splits, std::string source, std::s
 		splits.push_back(source);
 }
 
+void utils::split_str(std::map<std::string, std::string> &splits, std::string source, std::string delimiter1, std::string delimiter2)
+{
+	size_t index;
+	while (true) {
+		// 查找主分隔符
+		index = source.find(delimiter1);
+
+		// 主分隔符前面部分
+		string tmp = source.substr(0, index);
+
+		// 切分属性和值部分
+		size_t n = tmp.find(delimiter2);
+		splits.insert(make_pair(tmp.substr(0, n), tmp.substr(n+1, -1)));
+
+		// 主分隔符后面部分
+		source = source.substr(index+1, -1);
+		if (source == "") break;
+	}
+}
+

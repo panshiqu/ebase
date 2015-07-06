@@ -12,6 +12,7 @@
 #include <ctype.h>	// for toupper
 #include <string.h>	// for memset
 
+#include <map>
 #include <list>
 #include <iostream>
 
@@ -31,6 +32,8 @@ public:
 	static void split_str(std::list<int> &splits, std::string source, std::string delimiter);
 
 	static void split_str(std::list<std::string> &splits, std::string source, std::string delimiter);
+
+	static void split_str(std::map<std::string, std::string> &splits, std::string source, std::string delimiter1, std::string delimiter2);
 };
 
 #endif /* UTILS_H_ */
