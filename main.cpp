@@ -110,7 +110,8 @@ int main(int argc, char *argv[])
 	logger::ins().set_level(logger::LOG_LEVEL::TRACE);
 
 	// 解析自定义格式配置文件
-	config::ins().load("/root/桌面/ebase/example/xhome.conf");
+	config conf;
+	conf.load("/root/桌面/ebase/example/xhome.conf");
 
 	// 新增定时任务
 	t.set_callback(default_timer);
