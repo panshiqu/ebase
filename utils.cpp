@@ -98,6 +98,13 @@ void utils::split_str(std::map<std::string, std::string> &splits, std::string so
 		// 查找主分隔符
 		index = source.find(delimiter1);
 
+		// 没有找到进入最后一次切分
+		if (index == string::npos) {
+			size_t m = source.find(delimiter2);
+			splits.insert(make_pair(source.substr(0, m), source.substr(m+1, -1)));
+			break;
+		}
+
 		// 主分隔符前面部分
 		string tmp = source.substr(0, index);
 
