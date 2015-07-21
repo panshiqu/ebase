@@ -129,5 +129,6 @@ void buffer::write_data(char *data, int len)
 	// 数据拷贝
 	ensure(len);
 	memcpy(&_buffer[_valid_offset], data, len);
+	_valid_offset += len;
 }
 
